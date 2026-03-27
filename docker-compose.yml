@@ -1,0 +1,39 @@
+services:
+  api:
+    build: .
+    container_name: football-api
+    env_file:
+      - .env.example
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: on-failure
+  postgres:
+    image: postgres:16
+    container_name: football-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: football_api
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d football_api"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+  redis:
+    image: redis:7
+    container_name: football-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  pg_data:

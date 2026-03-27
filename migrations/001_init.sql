@@ -1,0 +1,63 @@
+-- Reference SQL migration (runtime migration uses GORM AutoMigrate in database.Init)
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(120) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP NULL
+);
+
+CREATE TABLE IF NOT EXISTS teams (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(120) UNIQUE NOT NULL,
+  founded_year INT NOT NULL,
+  hq_address VARCHAR(255) NOT NULL,
+  hq_city VARCHAR(120) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP NULL
+);
+
+CREATE TABLE IF NOT EXISTS players (
+  id BIGSERIAL PRIMARY KEY,
+  team_id BIGINT NOT NULL REFERENCES teams(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  name VARCHAR(120) NOT NULL,
+  height_cm INT NOT NULL,
+  weight_kg INT NOT NULL,
+  position VARCHAR(30) NOT NULL,
+  jersey_number INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP NULL,
+  CONSTRAINT uq_team_jersey UNIQUE (team_id, jersey_number)
+);
+
+CREATE TABLE IF NOT EXISTS matches (
+  id BIGSERIAL PRIMARY KEY,
+  kickoff_at TIMESTAMP NOT NULL,
+  home_team_id BIGINT NOT NULL REFERENCES teams(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  away_team_id BIGINT NOT NULL REFERENCES teams(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  status VARCHAR(20) NOT NULL DEFAULT 'scheduled',
+  home_score INT NOT NULL DEFAULT 0,
+  away_score INT NOT NULL DEFAULT 0,
+  submitted_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP NULL
+);
+
+CREATE TABLE IF NOT EXISTS goal_events (
+  id BIGSERIAL PRIMARY KEY,
+  match_id BIGINT NOT NULL REFERENCES matches(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  team_id BIGINT NOT NULL REFERENCES teams(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  player_id BIGINT NOT NULL REFERENCES players(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  minute INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_players_team_id ON players(team_id);
+CREATE INDEX IF NOT EXISTS idx_goal_events_match_id ON goal_events(match_id);
+

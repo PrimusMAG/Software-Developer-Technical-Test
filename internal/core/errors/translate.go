@@ -1,0 +1,33 @@
+package errors
+
+import (
+	goerrors "errors"
+	"net/http"
+
+	"github.com/jackc/pgx/v5/pgconn"
+	"gorm.io/gorm"
+)
+
+func Translate(err error, fallbackStatus int, fallbackCode, fallbackMessage string) (int, string, string) {
+	if err == nil {
+		return fallbackStatus, fallbackCode, fallbackMessage
+	}
+
+	if goerrors.Is(err, gorm.ErrRecordNotFound) {
+		return http.StatusNotFound, "RESOURCE_NOT_FOUND", "resource not found"
+	}
+
+	var pgErr *pgconn.PgError
+	if goerrors.As(err, &pgErr) {
+		switch pgErr.Code {
+		case "23505":
+			return http.StatusConflict, "DUPLICATE_RESOURCE", "resource already exists"
+		case "23503":
+			return http.StatusBadRequest, "INVALID_REFERENCE", "invalid related resource"
+		case "22P02":
+			return http.StatusBadRequest, "INVALID_INPUT", "invalid input value"
+		}
+	}
+
+	return fallbackStatus, fallbackCode, fallbackMessage
+}

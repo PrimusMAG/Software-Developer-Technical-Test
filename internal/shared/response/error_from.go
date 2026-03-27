@@ -1,0 +1,12 @@
+package response
+
+import (
+	"github.com/gin-gonic/gin"
+
+	coreerrors "football-api/internal/core/errors"
+)
+
+func ErrorFrom(c *gin.Context, err error, fallbackStatus int, fallbackCode, fallbackMessage string) {
+	status, code, message := coreerrors.Translate(err, fallbackStatus, fallbackCode, fallbackMessage)
+	Error(c, status, message, code)
+}
