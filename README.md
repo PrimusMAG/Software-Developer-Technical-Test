@@ -45,23 +45,27 @@ Tradeoff:
 .
 ├── cmd/
 │   └── api/
-│       └── main.go                        # bootstrap app, middleware, central route register
+│       └── main.go                                      # bootstrap app, middleware, central route register
+├── docs/
+│   └── postman/
+│       ├── football-api.postman_collection.json         # API requests collection 
+│       ├── local.postman_environment.json               # Local environment variables
 ├── internal/
 │   ├── core/
 │   │   ├── config/
-│   │   │   └── config.go                  # env loader + default config
+│   │   │   └── config.go                                # env loader + default config
 │   │   ├── database/
-│   │   │   └── database.go                # DB init, pool setup, automigrate, seed
+│   │   │   └── database.go                              # DB init, pool setup, automigrate, seed
 │   │   ├── errors/
-│   │   │   └── app_error.go               # shared app error type
+│   │   │   └── app_error.go                             # shared app error type
 │   │   ├── logger/
-│   │   │   └── logger.go                  # logger abstraction
+│   │   │   └── logger.go                                # logger abstraction
 │   │   └── middleware/
-│   │       ├── auth.go                    # JWT auth + RBAC role middleware
-│   │       ├── rate_limit.go              # login rate limiter
-│   │       ├── recovery.go                # panic recovery + standardized error
-│   │       ├── request_id.go              # request trace id middleware
-│   │       └── security.go                # CORS + secure headers
+│   │       ├── auth.go                                  # JWT auth + RBAC role middleware
+│   │       ├── rate_limit.go                            # login rate limiter
+│   │       ├── recovery.go                              # panic recovery + standardized error
+│   │       ├── request_id.go                            # request trace id middleware
+│   │       └── security.go                              # CORS + secure headers
 │   ├── domains/
 │   │   ├── auth/
 │   │   │   ├── controllers/auth_controller.go
@@ -104,12 +108,12 @@ Tradeoff:
 │   │       ├── routes/routes.go
 │   │       └── services/report_service.go
 │   └── shared/
-│       ├── constants/enums.go             # role, status match, player position
-│       ├── pagination/pagination.go       # pagination parser + helper
-│       ├── response/response.go           # response envelope standard
-│       └── validator/validator.go         # global request validation
+│       ├── constants/enums.go                           # role, status match, player position
+│       ├── pagination/pagination.go                     # pagination parser + helper
+│       ├── response/response.go                         # response envelope standard
+│       └── validator/validator.go                       # global request validation
 ├── migrations/
-│   └── 001_init.sql                       # reference SQL schema + index + FK
+│   └── 001_init.sql                                     # reference SQL schema + index + FK
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .env.example
@@ -256,6 +260,25 @@ cp .env.example .env
 ```bash
 go run ./cmd/api
 ```
+
+## API Documentation (Postman)
+
+Postman collection tersedia di repository:
+
+- Collection:
+  docs/postman/football-api.postman_collection.json
+
+- Environment:
+  docs/postman/local.postman_environment.json
+
+Atau dapat diakses melalui:
+(https://d311-teams.postman.co/workspace/Football-api-local~577f8abf-99c8-46e7-8108-df1355b34c19/collection/51494216-6966a264-25b2-40d3-8fc6-55cddf945711?sideView=agentMode)
+
+Langkah penggunaan:
+1. Import collection & environment ke Postman
+2. Pilih environment
+3. Jalankan request login untuk mendapatkan token
+4. Gunakan endpoint lain sesuai kebutuhan
 
 ## Seed Data Default
 Auto-seed saat startup:
